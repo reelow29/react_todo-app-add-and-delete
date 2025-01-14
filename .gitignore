@@ -11,5 +11,5 @@ yarn-error.log*
 
 raw_reports
 reports
-cypress/screenshots
-cypress/videos
+../react_todo-app-add-and-delete/cypress/screenshots
+../react_todo-app-add-and-delete/cypress/videos
