@@ -1,36 +1,33 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { UserWarning } from './components/UserWarning';
 import { getTodos, USER_ID } from './api/todos';
 import { TodoHeader } from './components/TodoHeader';
 import { TodoFooter } from './components/TodoFooter';
 import { TodoList } from './components/TodoList';
-import { Error } from './components/Error';
+import * as ErrorModule from './components/Error';
 import { Todo } from './types/Todo';
 
-export enum ErrorMessage {
-  Update = 'Unable to update a todo',
-  Add = 'Unable to add a todo',
-  Delete = 'Unable to delete a todo',
-  Get = 'Unable to load todos',
-  Title = 'Title should not be empty',
+// Enum for filter options
+export enum FilterOption {
+  All = 'All',
+  Active = 'Active',
+  Completed = 'Completed',
 }
 
 export const App: React.FC = () => {
   const [todoList, setTodoList] = useState<Todo[]>([]);
-  const [filteredTodos, setFilteredTodos] = useState<Todo[]>([]);
-
-  const [isLoading, setIsloading] = useState(false);
-
+  const [filterOption, setFilterOption] = useState<FilterOption>(
+    FilterOption.All,
+  );
+  const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    setIsloading(true);
+    setIsLoading(true);
     getTodos()
-      .then(todos => {
-        setTodoList(todos);
-      })
-      .catch(() => setErrorMessage(ErrorMessage.Get))
-      .finally(() => setIsloading(false));
+      .then(setTodoList)
+      .catch(() => setErrorMessage(ErrorModule.ErrorMessage.Get))
+      .finally(() => setIsLoading(false));
   }, []);
 
   const handleHideError = () => {
@@ -72,24 +69,21 @@ export const App: React.FC = () => {
     setTodoList(todoList.filter(todo => !todo.completed));
   };
 
-  const handleFilterTodo = useCallback(
-    (option: string) => {
-      switch (option) {
-        case 'All':
-          setFilteredTodos(todoList);
-          break;
-        case 'Active':
-          setFilteredTodos(todoList.filter(todo => todo.completed === false));
-          break;
-        case 'Completed':
-          setFilteredTodos(todoList.filter(todo => todo.completed === true));
-          break;
-        default:
-          setFilteredTodos(todoList);
-      }
-    },
-    [todoList],
-  );
+  const handleFilterTodo = (option: FilterOption) => {
+    setFilterOption(option);
+  };
+
+  // Визначення відфільтрованих завдань
+  const filteredTodos = todoList.filter(todo => {
+    switch (filterOption) {
+      case FilterOption.Active:
+        return !todo.completed;
+      case FilterOption.Completed:
+        return todo.completed;
+      default:
+        return true;
+    }
+  });
 
   if (!USER_ID) {
     return <UserWarning />;
@@ -121,7 +115,10 @@ export const App: React.FC = () => {
           />
         )}
       </div>
-      <Error errorMessage={errorMessage} onClose={handleHideError} />
+      <ErrorModule.Error
+        errorMessage={errorMessage}
+        onClose={handleHideError}
+      />
     </div>
   );
 };
