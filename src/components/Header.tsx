@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Todo } from '../types/Todo';
 import { USER_ID } from '../api/todos';
-import { ErrorMessage } from '../App';
+import { ErrorMessage } from './Error';
 
 interface TodoHeaderProps {
   onError: (error: string) => void;
