@@ -1,8 +1,8 @@
-export enum ErrorType {
-  Empty = '',
-  LoadTodos = 'Unable to load todos',
+export enum TodoErrorType {
+  UnableToLoadTodos = 'Unable to load todos',
+  UnableToAddTodo = 'Unable to add a todo',
+  UnableToDeleteTodo = 'Unable to delete a todo',
+  UnableToUpdateTodo = 'Unable to update a todo',
   EmptyTitle = 'Title should not be empty',
-  AddTodo = 'Unable to add a todo',
-  DeleteTodo = 'Unable to delete a todo',
-  UpdateTodo = 'Unable to update a todo',
+  None = '',
 }

@@ -1,51 +1,41 @@
-import React, { useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect } from 'react';
+import cn from 'classnames';
+import { TodoErrorType } from '../types/TodoErrorType';
 
-export enum ErrorMessage {
-  Update = 'Unable to update a todo',
-  Add = 'Unable to add a todo',
-  Delete = 'Unable to delete a todo',
-  Get = 'Unable to load todos',
-  Title = 'Title should not be empty',
-}
+type Props = {
+  error: TodoErrorType;
+  setError: Dispatch<SetStateAction<TodoErrorType>>;
+};
 
-interface ErrorMessageProps {
-  errorMessage: string;
-  onClose: () => void;
-}
+export const Error: React.FC<Props> = ({ error, setError }) => {
+  useEffect(() => {
+    if (!error) {
+      return;
+    }
 
-export const Error: React.FC<ErrorMessageProps> = ({
-  errorMessage,
-  onClose,
-}) => {
-  const [isVisible, setIsVisible] = useState(false);
-
-  if (errorMessage && !isVisible) {
-    setIsVisible(true);
-    setTimeout(() => {
-      setIsVisible(false);
-      onClose();
+    const timerId = setTimeout(() => {
+      setError(TodoErrorType.None);
     }, 3000);
-  }
 
-  const handleClose = () => {
-    setIsVisible(false);
-    onClose();
-  };
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, [error, setError]);
 
   return (
     <div
       data-cy="ErrorNotification"
-      className={`notification is-danger is-light has-text-weight-normal ${
-        isVisible ? '' : 'hidden'
-      }`}
+      className={cn('notification is-danger is-light has-text-weight-normal', {
+        hidden: !error,
+      })}
     >
       <button
         data-cy="HideErrorButton"
         type="button"
         className="delete"
-        onClick={handleClose}
+        onClick={() => setError(TodoErrorType.None)}
       />
-      {errorMessage}
+      {error}
     </div>
   );
 };
